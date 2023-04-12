@@ -3,6 +3,7 @@ const infoTextEl = document.getElementById('info-text');
 const meaningContainerEl = document.getElementById('meaning-container');
 const titleEl = document.getElementById('title');
 const meaningEl = document.getElementById('meaning');
+const audioEl = document.getElementById('audio');
 
 async function fetchAPI(word) {
   try {
@@ -12,15 +13,26 @@ async function fetchAPI(word) {
     infoTextEl.textContent = `Searching the meaning of "${word}"`;
     const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
     const result = await fetch(url).then((res) => res.json());
-    infoTextEl.style.display = 'none';
 
-    meaningContainerEl.style.display = 'block';
-    titleEl.textContent = result[0].word;
-    meaningEl.textContent = result[0].meanings[0].definitions[0].definition;
+    if (result.title) {
+      meaningContainerEl.style.display = 'block';
+      infoTextEl.style.display = 'none';
+      titleEl.textContent = word;
+      meaningEl.textContent = 'N/A';
+      audioEl.style.display = 'none';
+    } else {
+      infoTextEl.style.display = 'none';
+      meaningContainerEl.style.display = 'block';
+      audioEl.style.display = 'inline-flex';
+      titleEl.textContent = result[0].word;
+      meaningEl.textContent = result[0].meanings[0].definitions[0].definition;
+      audioEl.src = result[0].phonetics[0].audio;
+    }
 
     console.log(result);
   } catch (error) {
     console.log(error);
+    infoTextEl.textContent = `An error has occured, try again later`;
   }
 }
 
